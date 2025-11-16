@@ -7,9 +7,12 @@ requires-python = ">=3.14"
 dependencies = []
 
 [tool.ruff]
+src = ["src", "tests"]
 lint.extend-select = ["PTH"]
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.4.0",
     "pytest>=9.0.1",
+    "ruff>=0.14.5",
 ]
