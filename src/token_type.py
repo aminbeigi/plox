@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 
 class TokenType(Enum):
+    """Enumeration of all possible token types in the source code."""
     # single-character tokens
     LEFT_PAREN = auto()
     RIGHT_PAREN = auto()
@@ -50,3 +51,11 @@ class TokenType(Enum):
 
     # end of file
     EOF = auto()
+
+    def __repr__(self) -> str:
+        return f"TokenType.{self.name}"
+    
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, TokenType):
+            return NotImplemented
+        return self.name == value.name

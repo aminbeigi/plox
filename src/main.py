@@ -1,20 +1,21 @@
 import sys
 from pathlib import Path
 
-from lox import Lox
+from src.plox import Plox
 
 
 def main() -> int:
+    """Entry point for the Plox interpreter."""
     if len(sys.argv) > 2:
         print("Usage: plox [script]", file=sys.stderr)
         return 64  # EX_USAGE
     elif len(sys.argv) == 2:
-        lox = Lox()
+        plox = Plox()
         path = Path(sys.argv[1])
-        return lox.run_file(path)
+        return plox.run_file(path)
     else:
-        lox = Lox()
-        return lox.run_prompt()
+        plox = Plox()
+        return plox.run_prompt()
 
 
 if __name__ == "__main__":
