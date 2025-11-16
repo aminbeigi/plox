@@ -1,12 +1,14 @@
-from src.scanner import Scanner 
+from src.scanner import Scanner
 from src.token import Token
 from src.token_type import TokenType
+
 
 def test_scan_empty_source():
     scanner = Scanner(source="")
     scanner.scan_tokens()
     assert len(scanner.tokens) == 1
     assert scanner.tokens[0] == Token(TokenType.EOF, "", None, 1)
+
 
 def test_scan_number():
     scanner = Scanner(source="10")
@@ -15,6 +17,7 @@ def test_scan_number():
 
     assert scanner.tokens[0] == Token(TokenType.NUMBER, "10", 10.0, 1)
     assert scanner.tokens[1] == Token(TokenType.EOF, "", None, 1)
+
 
 def test_scan_variable_assignment():
     scanner = Scanner(source="var x = 25;")
@@ -27,12 +30,16 @@ def test_scan_variable_assignment():
     assert scanner.tokens[4] == Token(TokenType.SEMICOLON, ";", None, 1)
     assert scanner.tokens[5] == Token(TokenType.EOF, "", None, 1)
 
+
 def test_scan_string():
     scanner = Scanner(source='"hello, woRLD!"')
     scanner.scan_tokens()
     assert len(scanner.tokens) == 2
-    assert scanner.tokens[0] == Token(TokenType.STRING, '"hello, woRLD!"', "hello, woRLD!", 1)
+    assert scanner.tokens[0] == Token(
+        TokenType.STRING, '"hello, woRLD!"', "hello, woRLD!", 1
+    )
     assert scanner.tokens[1] == Token(TokenType.EOF, "", None, 1)
+
 
 def test_scan_comparision():
     scanner = Scanner(source="a != b == c < d")
@@ -46,6 +53,7 @@ def test_scan_comparision():
     assert scanner.tokens[5] == Token(TokenType.LESS, "<", None, 1)
     assert scanner.tokens[6] == Token(TokenType.IDENTIFIER, "d", None, 1)
     assert scanner.tokens[7] == Token(TokenType.EOF, "", None, 1)
+
 
 def test_scan_brackets_and_braces():
     scanner = Scanner(source="{}()")

@@ -19,7 +19,7 @@ class Token:
 
     def __repr__(self) -> str:
         return f"Token(self={self.token_type}, lexeme={self.lexeme}, literal={self.literal}, line={self.line})"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Token):
             return NotImplemented

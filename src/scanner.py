@@ -7,7 +7,7 @@ from src.plox import Plox
 
 class Scanner:
     """Scans source code and produces a list of tokens.
-    
+
     Attributes:
         source: The source code to scan.
         tokens: The list of tokens produced from scanning.
@@ -15,6 +15,7 @@ class Scanner:
         current: The current index in the source code being scanned.
         line: The current line number in the source code.
     """
+
     KEYWORDS = {
         "and": TokenType.AND,
         "class": TokenType.CLASS,

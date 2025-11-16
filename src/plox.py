@@ -4,6 +4,7 @@ from pathlib import Path
 
 class Plox:
     """The Lox interpreter class. Handles running files and REPL."""
+
     hadError = False
 
     def run_file(self, path: Path) -> int:
