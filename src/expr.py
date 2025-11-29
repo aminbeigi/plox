@@ -7,6 +7,8 @@ T = TypeVar("T")
 
 
 class Expr(ABC, Generic[T]):
+    """Base class for all expression types."""
+
     @abstractmethod
     def accept(self, visitor: T) -> T:
         """Accept a visitor for the Visitor pattern."""

@@ -8,8 +8,10 @@ T = TypeVar("T")
 
 
 class Visitor(ABC, Generic[T]):
+    """Visitor interface for expression nodes."""
+
     @abstractmethod
-    def visit_binary_expr(self, expression: BinaryExpr) -> T:
+    def visit_binary_expr(self, expr: BinaryExpr) -> T:
         pass
 
     @abstractmethod

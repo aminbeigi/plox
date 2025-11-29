@@ -3,6 +3,8 @@ from src.visitor import Visitor
 
 
 class AstPrinter(Visitor[str]):
+    """Prints the AST in a parenthesized format."""
+
     def print(self, expr: Expr) -> str:
         return expr.accept(self)
 
@@ -23,7 +25,7 @@ class AstPrinter(Visitor[str]):
     def _parenthesize(self, name: str, *exprs: Expr) -> str:
         res = "(" + name
         for expr in exprs:
-            res += ""
-            expr.accept(self)
+            res += " "
+            res += expr.accept(self)
         res += ")"
         return res
