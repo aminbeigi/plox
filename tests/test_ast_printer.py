@@ -6,7 +6,7 @@ from src.ast_printer import AstPrinter
 
 def test_binary():
     left = LiteralExpr(1)
-    operator = Token(token_type=TokenType.PLUS, lexeme="+", literal=None, line=1)
+    operator = Token(type=TokenType.PLUS, lexeme="+", literal=None, line=1)
     right = LiteralExpr(2)
     binaryExpr = BinaryExpr(left, operator, right)
     result = AstPrinter().print(binaryExpr)
@@ -22,7 +22,7 @@ def test_grouping():
 
 def test_unary():
     unaryExpr = UnaryExpr(
-        Token(token_type=TokenType.MINUS, lexeme="-", literal=None, line=1),
+        Token(type=TokenType.MINUS, lexeme="-", literal=None, line=1),
         LiteralExpr(500),
     )
     result = AstPrinter().print(unaryExpr)
@@ -37,10 +37,10 @@ def test_literal():
 
 def test_complex():
     left = UnaryExpr(
-        Token(token_type=TokenType.MINUS, lexeme="-", literal=None, line=1),
+        Token(type=TokenType.MINUS, lexeme="-", literal=None, line=1),
         LiteralExpr("123"),
     )
-    expression = Token(token_type=TokenType.STAR, lexeme="*", literal=None, line=1)
+    expression = Token(type=TokenType.STAR, lexeme="*", literal=None, line=1)
     right = GroupingExpr(LiteralExpr("45.67"))
     result = AstPrinter().print(BinaryExpr(left, expression, right))
     assert result == "(* (- 123) (group 45.67))"

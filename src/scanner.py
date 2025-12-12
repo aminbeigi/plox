@@ -2,7 +2,6 @@ from typing import List
 
 from src.token_type import TokenType
 from src.token import Token
-from src.plox import Plox
 
 
 class Scanner:
@@ -15,6 +14,8 @@ class Scanner:
         current: The current index in the source code being scanned.
         line: The current line number in the source code.
     """
+
+    NULL_CHAR = "\0"
 
     KEYWORDS = {
         "and": TokenType.AND,
@@ -36,20 +37,21 @@ class Scanner:
     }
 
     def __init__(self, source: str) -> None:
-        self.source = source
-        self.tokens: List[Token] = []
-        self.start = 0
-        self.current = 0
-        self.line = 1
+        self._source = source
+        self._tokens: List[Token] = []
+        self._start = 0
+        self._current = 0
+        self._line = 1
 
-    def scan_tokens(self) -> None:
+    def scan_tokens(self) -> list[Token]:
         """Scans the source code and populates the tokens list."""
         while not self._is_at_end():
-            self.start = self.current
+            self._start = self._current
             self._scan_token()
 
-        token = Token(TokenType.EOF, "", None, self.line)
-        self.tokens.append(token)
+        token = Token(TokenType.EOF, "", None, self._line)
+        self._tokens.append(token)
+        return self._tokens
 
     def _scan_token(self) -> None:
         """Scans a single token from the source code."""
@@ -109,7 +111,7 @@ class Scanner:
             case "\t":
                 pass
             case "\n":
-                self.line = self.line + 1
+                self._line = self._line + 1
             case '"':
                 self._string()
             case _:
@@ -118,45 +120,47 @@ class Scanner:
                 elif self._is_alpha(char):
                     self._identifier()
                 else:
-                    Plox.error(self.line, "Unexpected character.")
+                    from src.plox import Plox
+
+                    Plox.error_line(self._line, "Unexpected character.")
 
     def _add_token(self, token_type: TokenType, literal: object = None) -> None:
         """Adds a token to the tokens list."""
-        text = self.source[self.start : self.current]
-        token = Token(token_type, text, literal, self.line)
-        self.tokens.append(token)
+        text = self._source[self._start : self._current]
+        token = Token(token_type, text, literal, self._line)
+        self._tokens.append(token)
 
     def _advance(self) -> str:
         """Advances the scanner by one character and returns it."""
-        res = self.source[self.current]
-        self.current += 1
+        res = self._source[self._current]
+        self._current += 1
         return res
 
     def _is_at_end(self) -> bool:
         """Checks if the scanner has reached the end of the source code."""
-        return self.current >= len(self.source)
+        return self._current >= len(self._source)
 
     def _match(self, expected: str) -> bool:
         """Checks if the next character matches the expected character."""
         if self._is_at_end():
             return False
-        if self.source[self.current] != expected:
+        if self._source[self._current] != expected:
             return False
 
-        self.current = self.current + 1
+        self._current += 1
         return True
 
     def _peek(self) -> str:
         """Returns the current character without advancing the scanner."""
         if self._is_at_end():
-            return "\0"
-        return self.source[self.current]
+            return Scanner.NULL_CHAR
+        return self._source[self._current]
 
     def _peek_next(self) -> str:
         """Returns the character after the current one without advancing the scanner."""
-        if self.current + 1 >= len(self.source):
-            return "\0"
-        return self.source[self.current + 1]
+        if self._current + 1 >= len(self._source):
+            return Scanner.NULL_CHAR
+        return self._source[self._current + 1]
 
     def _is_alpha(self, char: str) -> bool:
         """Checks if a character is an alphabetic letter or underscore."""
@@ -170,16 +174,18 @@ class Scanner:
         """Scans a string literal from the source code."""
         while self._peek() != '"' and not self._is_at_end():
             if self._peek() == "\n":
-                self.line = self.line + 1
+                self._line = self._line + 1
             self._advance()
 
         if self._is_at_end():
-            Plox.error(self.line, "Unterminated string.")
+            from src.plox import Plox
+
+            Plox.error_line(self._line, "Unterminated string.")
             return
 
         self._advance()
 
-        value = self.source[self.start + 1 : self.current - 1]
+        value = self._source[self._start + 1 : self._current - 1]
         self._add_token(TokenType.STRING, value)
 
     def _number(self) -> None:
@@ -193,14 +199,16 @@ class Scanner:
             while self._peek().isdigit():
                 self._advance()
 
-        self._add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+        self._add_token(
+            TokenType.NUMBER, float(self._source[self._start : self._current])
+        )
 
     def _identifier(self) -> None:
         """Scans an identifier or keyword from the source code."""
         while self._is_alphanumeric(self._peek()):
             self._advance()
 
-        text = self.source[self.start : self.current]
+        text = self._source[self._start : self._current]
         token_type = Scanner.KEYWORDS.get(text)
         if token_type is None:
             token_type = TokenType.IDENTIFIER

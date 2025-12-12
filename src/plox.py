@@ -1,5 +1,10 @@
 import sys
 from pathlib import Path
+from src.token import Token
+from src.token_type import TokenType
+from src.scanner import Scanner
+from src.parser import Parser
+from src.ast_printer import AstPrinter
 
 
 class Plox:
@@ -36,13 +41,28 @@ class Plox:
 
     def _run(self, source: str) -> None:
         """Runs the given source code."""
-        tokens = source.split()
-        for token in tokens:
-            print(token)
+        scanner = Scanner(source)
+        tokens = scanner.scan_tokens()
+        parser = Parser(tokens)
+        expression = parser.parse()
+        if self.hadError:
+            return
+
+        if expression is not None:
+            astPrinter = AstPrinter()
+            print(astPrinter.print(expression))
 
     @staticmethod
-    def error(line: int, message: str) -> None:
-        """Reports an error at a specific line."""
+    def error(token: Token, message: str) -> None:
+        """Reports an error at a specific token."""
+        if token.type == TokenType.EOF:
+            Plox._report(token.line, " at end", message)
+        else:
+            Plox._report(token.line, f" at '{token.lexeme}'", message)
+
+    @staticmethod
+    def error_line(line: int, message: str) -> None:
+        """Reports an error at a specific line (for scanner errors)."""
         Plox._report(line, "", message)
 
     @staticmethod
