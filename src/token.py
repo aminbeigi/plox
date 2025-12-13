@@ -11,7 +11,13 @@ class Token:
         line: The line number where the token appears in the source code.
     """
 
-    def __init__(self, type: TokenType, lexeme: str, literal: object, line: int):
+    def __init__(
+        self,
+        type: TokenType,
+        lexeme: str,
+        literal: str | float | bool | None,
+        line: int,
+    ):
         self.type = type
         self.lexeme = lexeme
         self.literal = literal
