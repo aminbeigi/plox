@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from src.token_type import TokenType
 from src.token import Token
