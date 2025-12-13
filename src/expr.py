@@ -15,7 +15,7 @@ class Expr(ABC):
     @abstractmethod
     def accept(self, visitor: "Visitor[T]") -> T:
         """Accept a visitor for the Visitor pattern."""
-        pass
+        ...
 
 
 class BinaryExpr(Expr):
