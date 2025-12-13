@@ -4,10 +4,15 @@ from src.token_type import TokenType
 from src.expr import LiteralExpr
 
 
+def dummy_error_reporter(token: Token, message: str) -> None:
+    """Dummy error reporter for tests."""
+    pass
+
+
 def test_parser_creation():
     """Test basic parser creation with token list."""
     tokens = [Token(TokenType.NUMBER, "42", 42.0, 1), Token(TokenType.EOF, "", None, 1)]
-    parser = Parser(tokens)
+    parser = Parser(tokens, dummy_error_reporter)
 
     assert parser._tokens == tokens
     assert parser._current == 0
@@ -16,7 +21,7 @@ def test_parser_creation():
 def test_parse_simple_number():
     """Test parsing a simple number literal."""
     tokens = [Token(TokenType.NUMBER, "42", 42.0, 1), Token(TokenType.EOF, "", None, 1)]
-    parser = Parser(tokens)
+    parser = Parser(tokens, dummy_error_reporter)
 
     expr = parser._expression()
 
@@ -30,7 +35,7 @@ def test_parse_simple_string():
         Token(TokenType.STRING, '"hello"', "hello", 1),
         Token(TokenType.EOF, "", None, 1),
     ]
-    parser = Parser(tokens)
+    parser = Parser(tokens, dummy_error_reporter)
 
     expr = parser._expression()
 
@@ -41,7 +46,7 @@ def test_parse_simple_string():
 def test_parse_boolean_true():
     """Test parsing boolean true literal."""
     tokens = [Token(TokenType.TRUE, "true", None, 1), Token(TokenType.EOF, "", None, 1)]
-    parser = Parser(tokens)
+    parser = Parser(tokens, dummy_error_reporter)
 
     expr = parser._expression()
 
@@ -55,7 +60,7 @@ def test_parse_boolean_false():
         Token(TokenType.FALSE, "false", None, 1),
         Token(TokenType.EOF, "", None, 1),
     ]
-    parser = Parser(tokens)
+    parser = Parser(tokens, dummy_error_reporter)
 
     expr = parser._expression()
 

@@ -1,4 +1,3 @@
-import sys
 from typing import Callable
 
 from src.token_type import TokenType
@@ -38,19 +37,13 @@ class Scanner:
         "while": TokenType.WHILE,
     }
 
-    def __init__(
-        self, source: str, error_reporter: Callable[[int, str], None] | None = None
-    ) -> None:
+    def __init__(self, source: str, error_reporter: Callable[[int, str], None]) -> None:
         self._source = source
         self._tokens: list[Token] = []
         self._start = 0
         self._current = 0
         self._line = 1
-        self._error_reporter = error_reporter or self._default_error_reporter
-
-    def _default_error_reporter(self, line: int, message: str) -> None:
-        """Default error reporter that prints to stderr."""
-        print(f"[line {line}] Error: {message}", file=sys.stderr)
+        self._error_reporter = error_reporter
 
     def scan_tokens(self) -> list[Token]:
         """Scans the source code and populates the tokens list."""

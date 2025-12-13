@@ -41,9 +41,9 @@ class Plox:
 
     def _run(self, source: str) -> None:
         """Runs the given source code."""
-        scanner = Scanner(source)
+        scanner = Scanner(source, Plox.error_line)
         tokens = scanner.scan_tokens()
-        parser = Parser(tokens)
+        parser = Parser(tokens, Plox.error)
         expression = parser.parse()
         if self.hadError:
             return

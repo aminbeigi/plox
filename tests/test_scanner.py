@@ -3,15 +3,20 @@ from src.token import Token
 from src.token_type import TokenType
 
 
+def dummy_error_reporter(line: int, message: str) -> None:
+    """Dummy error reporter for tests."""
+    pass
+
+
 def test_scan_empty_source():
-    scanner = Scanner(source="")
+    scanner = Scanner(source="", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 1
     assert tokens[0] == Token(TokenType.EOF, "", None, 1)
 
 
 def test_scan_number():
-    scanner = Scanner(source="10")
+    scanner = Scanner(source="10", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 2
 
@@ -20,7 +25,7 @@ def test_scan_number():
 
 
 def test_scan_variable_assignment():
-    scanner = Scanner(source="var x = 25;")
+    scanner = Scanner(source="var x = 25;", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 6
     assert tokens[0] == Token(TokenType.VAR, "var", None, 1)
@@ -32,7 +37,7 @@ def test_scan_variable_assignment():
 
 
 def test_scan_string():
-    scanner = Scanner(source='"hello, woRLD!"')
+    scanner = Scanner(source='"hello, woRLD!"', error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 2
     assert tokens[0] == Token(TokenType.STRING, '"hello, woRLD!"', "hello, woRLD!", 1)
@@ -40,7 +45,7 @@ def test_scan_string():
 
 
 def test_scan_comparision():
-    scanner = Scanner(source="a != b == c < d")
+    scanner = Scanner(source="a != b == c < d", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 8
     assert tokens[0] == Token(TokenType.IDENTIFIER, "a", None, 1)
@@ -54,7 +59,7 @@ def test_scan_comparision():
 
 
 def test_scan_brackets_and_braces():
-    scanner = Scanner(source="{}()")
+    scanner = Scanner(source="{}()", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
     assert len(tokens) == 5
     assert tokens[0] == Token(TokenType.LEFT_BRACE, "{", None, 1)
@@ -84,7 +89,7 @@ def test_scan_all_keywords():
         "while",
     ]
     source = " ".join(keywords)
-    scanner = Scanner(source)
+    scanner = Scanner(source, error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
 
     # Should have all keyword tokens plus EOF
@@ -117,7 +122,9 @@ def test_scan_all_keywords():
 
 
 def test_scan_all_operators():
-    scanner = Scanner(source="+ - * / = == != < <= > >= ! , . ;")
+    scanner = Scanner(
+        source="+ - * / = == != < <= > >= ! , . ;", error_reporter=dummy_error_reporter
+    )
     tokens = scanner.scan_tokens()
 
     expected_types = [
@@ -145,7 +152,7 @@ def test_scan_all_operators():
 
 
 def test_scan_decimal_numbers():
-    scanner = Scanner(source="123.456 0.5 999.999")
+    scanner = Scanner(source="123.456 0.5 999.999", error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 4  # 3 numbers + EOF
@@ -156,7 +163,10 @@ def test_scan_decimal_numbers():
 
 
 def test_scan_identifiers():
-    scanner = Scanner(source="variable _private myVar123 some_function")
+    scanner = Scanner(
+        source="variable _private myVar123 some_function",
+        error_reporter=dummy_error_reporter,
+    )
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 5  # 4 identifiers + EOF
@@ -168,7 +178,10 @@ def test_scan_identifiers():
 
 
 def test_scan_comments():
-    scanner = Scanner(source="var x = 5; // This is a comment\nvar y = 10;")
+    scanner = Scanner(
+        source="var x = 5; // This is a comment\nvar y = 10;",
+        error_reporter=dummy_error_reporter,
+    )
     tokens = scanner.scan_tokens()
 
     # Should skip the comment and parse the two variable declarations
@@ -187,7 +200,7 @@ def test_scan_comments():
 
 
 def test_scan_multiline_string():
-    scanner = Scanner(source='"hello\nworld"')
+    scanner = Scanner(source='"hello\nworld"', error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 2
@@ -196,7 +209,9 @@ def test_scan_multiline_string():
 
 
 def test_scan_whitespace_handling():
-    scanner = Scanner(source="  var\t  x\r\n=\n  5  ")
+    scanner = Scanner(
+        source="  var\t  x\r\n=\n  5  ", error_reporter=dummy_error_reporter
+    )
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 5  # var x = 5 EOF
@@ -209,7 +224,9 @@ def test_scan_whitespace_handling():
 
 def test_scan_keyword_vs_identifier():
     # Test that keywords are recognized correctly vs similar identifiers
-    scanner = Scanner(source="if iffy var variable true truthy")
+    scanner = Scanner(
+        source="if iffy var variable true truthy", error_reporter=dummy_error_reporter
+    )
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 7  # 6 tokens + EOF
@@ -225,7 +242,8 @@ def test_scan_keyword_vs_identifier():
 def test_scan_complex_expression():
     # Test a more complex expression
     scanner = Scanner(
-        source="fun fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}"
+        source="fun fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}",
+        error_reporter=dummy_error_reporter,
     )
     tokens = scanner.scan_tokens()
 
@@ -241,7 +259,7 @@ def test_scan_complex_expression():
 
 
 def test_scan_empty_string():
-    scanner = Scanner(source='""')
+    scanner = Scanner(source='""', error_reporter=dummy_error_reporter)
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 2
@@ -250,7 +268,9 @@ def test_scan_empty_string():
 
 
 def test_scan_single_line_comment_at_end():
-    scanner = Scanner(source="var x = 5; // comment at end")
+    scanner = Scanner(
+        source="var x = 5; // comment at end", error_reporter=dummy_error_reporter
+    )
     tokens = scanner.scan_tokens()
 
     # Should scan everything before the comment
@@ -265,7 +285,9 @@ def test_scan_single_line_comment_at_end():
 
 def test_scan_number_edge_cases():
     # Test various number formats
-    scanner = Scanner(source="0 0.0 123 123.0 0.123")
+    scanner = Scanner(
+        source="0 0.0 123 123.0 0.123", error_reporter=dummy_error_reporter
+    )
     tokens = scanner.scan_tokens()
 
     assert len(tokens) == 6  # 5 numbers + EOF
