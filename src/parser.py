@@ -1,3 +1,5 @@
+import sys
+from typing import Callable
 from src.token import Token
 from src.token_type import TokenType
 from src.expr import Expr
@@ -9,9 +11,23 @@ from src.exceptions import ParseError
 
 
 class Parser:
-    def __init__(self, tokens: list[Token]):
+    def __init__(
+        self,
+        tokens: list[Token],
+        error_reporter: Callable[[Token, str], None] | None = None,
+    ):
         self._tokens: list[Token] = tokens
         self._current = 0
+        self._error_reporter = error_reporter or self._default_error_reporter
+
+    def _default_error_reporter(self, token: Token, message: str) -> None:
+        """Default error reporter that prints to stderr."""
+        line = token.line
+        if token.type == TokenType.EOF:
+            location = " at end"
+        else:
+            location = f" at '{token.lexeme}'"
+        print(f"[line {line}] Error{location}: {message}", file=sys.stderr)
 
     def parse(self) -> Expr | None:
         try:
@@ -101,9 +117,7 @@ class Parser:
         raise self._error(self._peek(), message)
 
     def _error(self, token: Token, message: str) -> ParseError:
-        from src.plox import Plox
-
-        Plox.error(token, message)
+        self._error_reporter(token, message)
         return ParseError()
 
     def _synchronize(self) -> None:

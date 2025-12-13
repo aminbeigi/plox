@@ -1,4 +1,5 @@
-from typing import List
+import sys
+from typing import Callable
 
 from src.token_type import TokenType
 from src.token import Token
@@ -13,6 +14,7 @@ class Scanner:
         start: The starting index of the current lexeme being scanned.
         current: The current index in the source code being scanned.
         line: The current line number in the source code.
+        error_reporter: Function to call when reporting errors.
     """
 
     NULL_CHAR = "\0"
@@ -36,12 +38,19 @@ class Scanner:
         "while": TokenType.WHILE,
     }
 
-    def __init__(self, source: str) -> None:
+    def __init__(
+        self, source: str, error_reporter: Callable[[int, str], None] | None = None
+    ) -> None:
         self._source = source
-        self._tokens: List[Token] = []
+        self._tokens: list[Token] = []
         self._start = 0
         self._current = 0
         self._line = 1
+        self._error_reporter = error_reporter or self._default_error_reporter
+
+    def _default_error_reporter(self, line: int, message: str) -> None:
+        """Default error reporter that prints to stderr."""
+        print(f"[line {line}] Error: {message}", file=sys.stderr)
 
     def scan_tokens(self) -> list[Token]:
         """Scans the source code and populates the tokens list."""
@@ -120,9 +129,7 @@ class Scanner:
                 elif self._is_alpha(char):
                     self._identifier()
                 else:
-                    from src.plox import Plox
-
-                    Plox.error_line(self._line, "Unexpected character.")
+                    self._error_reporter(self._line, "Unexpected character.")
 
     def _add_token(self, token_type: TokenType, literal: object = None) -> None:
         """Adds a token to the tokens list."""
@@ -178,9 +185,7 @@ class Scanner:
             self._advance()
 
         if self._is_at_end():
-            from src.plox import Plox
-
-            Plox.error_line(self._line, "Unterminated string.")
+            self._error_reporter(self._line, "Unterminated string.")
             return
 
         self._advance()
