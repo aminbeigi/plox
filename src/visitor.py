@@ -15,13 +15,13 @@ class Visitor(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    def visit_literal_expr(self, expr: LiteralExpr) -> T:
-        pass
-
-    @abstractmethod
     def visit_grouping_expr(self, expr: GroupingExpr) -> T:
         pass
 
     @abstractmethod
     def visit_unary_expr(self, expr: UnaryExpr) -> T:
+        pass
+
+    @abstractmethod
+    def visit_literal_expr(self, expr: LiteralExpr) -> T:
         pass

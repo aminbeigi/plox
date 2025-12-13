@@ -4,13 +4,17 @@ from src.token import Token
 from src.token_type import TokenType
 from src.scanner import Scanner
 from src.parser import Parser
-from src.ast_printer import AstPrinter
+from src.plox_runtime_error import PloxRuntimeError
+from src.interpreter import Interpreter
+from src.constants import EX_DATAERR, EX_SOFTWARE
 
 
 class Plox:
     """The Lox interpreter class. Handles running files and REPL."""
 
     had_error = False
+    had_runtime_error = False
+    interpreter = Interpreter()
 
     def run_file(self, path: Path) -> int:
         """Runs a Plox script from a file."""
@@ -22,7 +26,10 @@ class Plox:
         self._run(lines)
 
         if Plox.had_error:
-            return 1
+            return EX_DATAERR
+
+        if Plox.had_runtime_error:
+            return EX_SOFTWARE
         return 0
 
     def run_prompt(self) -> int:
@@ -45,12 +52,10 @@ class Plox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, Plox.error)
         expression = parser.parse()
-        if self.had_error:
+        if Plox.had_error:
             return
-
-        if expression is not None:
-            astPrinter = AstPrinter()
-            print(astPrinter.print(expression))
+        assert expression is not None
+        Plox.interpreter.interpret(expression, Plox.runtime_error)
 
     @staticmethod
     def error(token: Token, message: str) -> None:
@@ -64,6 +69,11 @@ class Plox:
     def error_line(line: int, message: str) -> None:
         """Reports an error at a specific line (for scanner errors)."""
         Plox._report(line, "", message)
+
+    @staticmethod
+    def runtime_error(error: PloxRuntimeError) -> None:
+        print(f"{error.message}\n[line {error.token.line}]", file=sys.stderr)
+        Plox.had_runtime_error = True
 
     @staticmethod
     def _report(line: int, where: str, message: str) -> None:

@@ -2,9 +2,7 @@ import sys
 from pathlib import Path
 
 from src.plox import Plox
-
-# Exit codes following Unix conventions
-EX_USAGE = 64  # Command line usage error
+from src.constants import EX_USAGE
 
 
 def main() -> int:
