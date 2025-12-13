@@ -4,7 +4,7 @@ from src.token import Token
 from src.token_type import TokenType
 from src.scanner import Scanner
 from src.parser import Parser
-from src.plox_runtime_error import PloxRuntimeError
+from src.exceptions import PloxRuntimeError
 from src.interpreter import Interpreter
 from src.constants import EX_DATAERR, EX_SOFTWARE
 

@@ -2,7 +2,7 @@ from src.expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, Expr
 from src.visitor import Visitor
 from src.token_type import TokenType
 from src.token import Token
-from src.plox_runtime_error import PloxRuntimeError
+from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
 
 

@@ -6,7 +6,7 @@ from src.expr import BinaryExpr
 from src.expr import UnaryExpr
 from src.expr import LiteralExpr
 from src.expr import GroupingExpr
-from src.parse_error import ParseError
+from src.exceptions import ParseError
 
 
 class Parser:
