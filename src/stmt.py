@@ -1,7 +1,7 @@
 from src.expr import Expr
 
 from abc import ABC, abstractmethod
-from typing import Protocol, TypeVar
+from typing import Generic, TypeVar
 
 
 R = TypeVar("R")
@@ -12,7 +12,7 @@ class Stmt(ABC):
     Base class for all statement nodes.
     """
 
-    class Visitor(Protocol[R]):
+    class Visitor(ABC, Generic[R]):
         def visit_expression_stmt(self, stmt: Expression) -> R: ...
         def visit_print_stmt(self, stmt: Print) -> R: ...
 
