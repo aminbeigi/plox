@@ -10,6 +10,7 @@ class Interpreter(Visitor[object]):
     def interpret(
         self, expression: Expr, error_reporter: Callable[[PloxRuntimeError], None]
     ) -> None:
+        """Interpret an expression and print the result."""
         try:
             value = self._evaluate(expression)
             print(self._stringify(value))
@@ -17,6 +18,7 @@ class Interpreter(Visitor[object]):
             error_reporter(error)
 
     def _stringify(self, obj: object) -> str:
+        """Convert a Lox value to its string representation."""
         if obj is None:
             return "nil"
 
@@ -29,6 +31,7 @@ class Interpreter(Visitor[object]):
         return str(obj)
 
     def visit_binary_expr(self, expr: BinaryExpr) -> object:
+        """Evaluate a binary expression."""
         left = self._evaluate(expr.left)
         right = self._evaluate(expr.right)
 
@@ -85,9 +88,11 @@ class Interpreter(Visitor[object]):
         return None  # unreachable
 
     def visit_grouping_expr(self, expr: GroupingExpr) -> object:
+        """Evaluate a grouping expression (parentheses)."""
         return self._evaluate(expr.expression)
 
     def visit_unary_expr(self, expr: UnaryExpr) -> object:
+        """Evaluate a unary expression."""
         right = self._evaluate(expr.right)
 
         match expr.operator.type:
@@ -101,12 +106,15 @@ class Interpreter(Visitor[object]):
         return None  # unreachable
 
     def visit_literal_expr(self, expr: LiteralExpr) -> object:
+        """Evaluate a literal expression."""
         return expr.value
 
     def _evaluate(self, expr: Expr) -> object:
+        """Evaluate an expression using the visitor pattern."""
         return expr.accept(self)
 
     def _is_truthy(self, object: object) -> bool:
+        """Determine if a value is truthy in Lox."""
         if object is None:
             return False
         if isinstance(object, bool):
@@ -114,6 +122,7 @@ class Interpreter(Visitor[object]):
         return True
 
     def _is_equal(self, object_a: object, object_b: object) -> bool:
+        """Test if two values are equal in Lox."""
         if object_a is None and object_b is None:
             return True
         if object_a is None:
@@ -121,6 +130,7 @@ class Interpreter(Visitor[object]):
         return object_a == object_b
 
     def _check_number_operand(self, operator: Token, operand: object) -> None:
+        """Check that an operand is a number for unary operations."""
         if isinstance(operand, (int, float)):
             return
         raise PloxRuntimeError(operator, "Operand must be a number.")
@@ -128,6 +138,7 @@ class Interpreter(Visitor[object]):
     def _check_number_operands(
         self, operator: Token, left: object, right: object
     ) -> None:
+        """Check that both operands are numbers for binary operations."""
         if isinstance(left, (int, float)) and isinstance(right, (int, float)):
             return
         raise PloxRuntimeError(operator, "Operands must be numbers.")

@@ -15,20 +15,24 @@ class Parser:
         tokens: list[Token],
         error_reporter: Callable[[Token, str], None],
     ):
+        """Initialize the parser with tokens and error reporting."""
         self._tokens: list[Token] = tokens
         self._current = 0
         self._error_reporter = error_reporter
 
     def parse(self) -> Expr | None:
+        """Parse the tokens into an expression AST."""
         try:
             return self._expression()
         except ParseError:
             return None
 
     def _expression(self) -> Expr:
+        """Parse an expression (top-level rule)."""
         return self._equality()
 
     def _equality(self) -> Expr:
+        """Parse equality expressions (== !=)."""
         expr = self._comparison()
 
         while self._match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
@@ -38,6 +42,7 @@ class Parser:
         return expr
 
     def _comparison(self) -> Expr:
+        """Parse comparison expressions (> >= < <=)."""
         expr = self._term()
 
         while self._match(
@@ -52,6 +57,7 @@ class Parser:
         return expr
 
     def _term(self) -> Expr:
+        """Parse term expressions (+ -)."""
         expr = self._factor()
 
         while self._match(TokenType.MINUS, TokenType.PLUS):
@@ -61,6 +67,7 @@ class Parser:
         return expr
 
     def _factor(self) -> Expr:
+        """Parse factor expressions (* /)."""
         expr = self._unary()
 
         while self._match(TokenType.SLASH, TokenType.STAR):
@@ -70,6 +77,7 @@ class Parser:
         return expr
 
     def _unary(self) -> Expr:
+        """Parse unary expressions (! -)."""
         if self._match(TokenType.BANG, TokenType.MINUS):
             operator = self._previous()
             right = self._unary()
@@ -77,6 +85,7 @@ class Parser:
         return self._primary()
 
     def _primary(self) -> Expr:
+        """Parse primary expressions (literals, identifiers, parentheses)."""
         if self._match(TokenType.FALSE):
             return LiteralExpr(False)
         if self._match(TokenType.TRUE):
@@ -95,6 +104,7 @@ class Parser:
         raise self._error(self._peek(), "Expect expression.")
 
     def _match(self, *types: TokenType):
+        """Check if current token matches any of the given types."""
         for type in types:
             if self._check(type):
                 self._advance()
@@ -102,15 +112,18 @@ class Parser:
         return False
 
     def _consume(self, type: TokenType, message: str) -> Token:
+        """Consume a token of the expected type or report an error."""
         if self._check(type):
             return self._advance()
         raise self._error(self._peek(), message)
 
     def _error(self, token: Token, message: str) -> ParseError:
+        """Report a parse error and return a ParseError exception."""
         self._error_reporter(token, message)
         return ParseError()
 
     def _synchronize(self) -> None:
+        """Synchronize parser after an error by finding statement boundaries."""
         self._advance()
 
         while not self._is_at_end():
@@ -137,20 +150,25 @@ class Parser:
             self._advance()
 
     def _check(self, type: TokenType) -> bool:
+        """Check if current token is of the given type."""
         if self._is_at_end():
             return False
         return self._peek().type == type
 
     def _advance(self) -> Token:
+        """Advance to the next token and return the current one."""
         if not self._is_at_end():
             self._current += 1
         return self._previous()
 
     def _is_at_end(self) -> bool:
+        """Check if we've reached the end of tokens."""
         return self._peek().type == TokenType.EOF
 
     def _peek(self) -> Token:
+        """Return the current token without advancing."""
         return self._tokens[self._current]
 
     def _previous(self) -> Token:
+        """Return the previously consumed token."""
         return self._tokens[self._current - 1]
