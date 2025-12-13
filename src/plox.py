@@ -10,7 +10,7 @@ from src.ast_printer import AstPrinter
 class Plox:
     """The Lox interpreter class. Handles running files and REPL."""
 
-    hadError = False
+    had_error = False
 
     def run_file(self, path: Path) -> int:
         """Runs a Plox script from a file."""
@@ -21,7 +21,7 @@ class Plox:
             return 1
         self._run(lines)
 
-        if Plox.hadError:
+        if Plox.had_error:
             return 1
         return 0
 
@@ -45,7 +45,7 @@ class Plox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, Plox.error)
         expression = parser.parse()
-        if self.hadError:
+        if self.had_error:
             return
 
         if expression is not None:
@@ -69,4 +69,4 @@ class Plox:
     def _report(line: int, where: str, message: str) -> None:
         """Reports an error with line number and message."""
         print(f"[line {line} Error{where} : {message}]", file=sys.stderr)
-        Plox.hadError = True
+        Plox.had_error = True
