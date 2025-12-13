@@ -124,7 +124,9 @@ class Scanner:
                 else:
                     self._error_reporter(self._line, "Unexpected character.")
 
-    def _add_token(self, token_type: TokenType, literal: object = None) -> None:
+    def _add_token(
+        self, token_type: TokenType, literal: str | float | bool | None = None
+    ) -> None:
         """Adds a token to the tokens list."""
         text = self._source[self._start : self._current]
         token = Token(token_type, text, literal, self._line)
