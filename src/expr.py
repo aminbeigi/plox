@@ -1,16 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import TypeVar, TYPE_CHECKING
 
 from src.token import Token
+
+if TYPE_CHECKING:
+    from src.visitor import Visitor
 
 T = TypeVar("T")
 
 
-class Expr(ABC, Generic[T]):
+class Expr(ABC):
     """Base class for all expression types."""
 
     @abstractmethod
-    def accept(self, visitor: T) -> T:
+    def accept(self, visitor: "Visitor[T]") -> T:
         """Accept a visitor for the Visitor pattern."""
         pass
 
@@ -21,7 +24,7 @@ class BinaryExpr(Expr):
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor):
+    def accept(self, visitor: "Visitor[T]") -> T:
         return visitor.visit_binary_expr(self)
 
 
@@ -30,7 +33,7 @@ class UnaryExpr(Expr):
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor):
+    def accept(self, visitor: "Visitor[T]") -> T:
         return visitor.visit_unary_expr(self)
 
 
@@ -38,7 +41,7 @@ class GroupingExpr(Expr):
     def __init__(self, expression: Expr) -> None:
         self.expression = expression
 
-    def accept(self, visitor):
+    def accept(self, visitor: "Visitor[T]") -> T:
         return visitor.visit_grouping_expr(self)
 
 
@@ -46,5 +49,5 @@ class LiteralExpr(Expr):
     def __init__(self, value: object) -> None:
         self.value = value
 
-    def accept(self, visitor):
+    def accept(self, visitor: "Visitor[T]") -> T:
         return visitor.visit_literal_expr(self)

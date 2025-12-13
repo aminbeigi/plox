@@ -12,9 +12,10 @@ from src.constants import EX_DATAERR, EX_SOFTWARE
 class Plox:
     """The Lox interpreter class. Handles running files and REPL."""
 
-    had_error = False
-    had_runtime_error = False
-    interpreter = Interpreter()
+    def __init__(self):
+        self._had_error = False
+        self._had_runtime_error = False
+        self._interpreter = Interpreter()
 
     def run_file(self, path: Path) -> int:
         """Runs a Plox script from a file."""
@@ -25,10 +26,10 @@ class Plox:
             return 1
         self._run(lines)
 
-        if Plox.had_error:
+        if self._had_error:
             return EX_DATAERR
 
-        if Plox.had_runtime_error:
+        if self._had_runtime_error:
             return EX_SOFTWARE
         return 0
 
@@ -48,35 +49,31 @@ class Plox:
 
     def _run(self, source: str) -> None:
         """Runs the given source code."""
-        scanner = Scanner(source, Plox.error_line)
+        scanner = Scanner(source, self._error_line)
         tokens = scanner.scan_tokens()
-        parser = Parser(tokens, Plox.error)
+        parser = Parser(tokens, self._error)
         expression = parser.parse()
-        if Plox.had_error:
+        if self._had_error:
             return
         assert expression is not None
-        Plox.interpreter.interpret(expression, Plox.runtime_error)
+        self._interpreter.interpret(expression, self._runtime_error)
 
-    @staticmethod
-    def error(token: Token, message: str) -> None:
+    def _error(self, token: Token, message: str) -> None:
         """Reports an error at a specific token."""
         if token.type == TokenType.EOF:
-            Plox._report(token.line, " at end", message)
+            self._report(token.line, " at end", message)
         else:
-            Plox._report(token.line, f" at '{token.lexeme}'", message)
+            self._report(token.line, f" at '{token.lexeme}'", message)
 
-    @staticmethod
-    def error_line(line: int, message: str) -> None:
+    def _error_line(self, line: int, message: str) -> None:
         """Reports an error at a specific line (for scanner errors)."""
-        Plox._report(line, "", message)
+        self._report(line, "", message)
 
-    @staticmethod
-    def runtime_error(error: PloxRuntimeError) -> None:
+    def _runtime_error(self, error: PloxRuntimeError) -> None:
         print(f"{error.message}\n[line {error.token.line}]", file=sys.stderr)
-        Plox.had_runtime_error = True
+        self._had_runtime_error = True
 
-    @staticmethod
-    def _report(line: int, where: str, message: str) -> None:
+    def _report(self, line: int, where: str, message: str) -> None:
         """Reports an error with line number and message."""
         print(f"[line {line} Error{where} : {message}]", file=sys.stderr)
-        Plox.had_error = True
+        self._had_error = True

@@ -31,7 +31,7 @@ class Parser:
     def _equality(self) -> Expr:
         expr = self._comparison()
 
-        while self._match(TokenType.BANG_EQUAL, TokenType.BANG_EQUAL):
+        while self._match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator = self._previous()
             right = self._comparison()
             expr = BinaryExpr(expr, operator, right)

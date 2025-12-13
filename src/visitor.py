@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, TYPE_CHECKING
 
-from src.expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr
+if TYPE_CHECKING:
+    from src.expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr
 
 
 T = TypeVar("T")
@@ -11,17 +12,17 @@ class Visitor(ABC, Generic[T]):
     """Visitor interface for expression nodes."""
 
     @abstractmethod
-    def visit_binary_expr(self, expr: BinaryExpr) -> T:
+    def visit_binary_expr(self, expr: "BinaryExpr") -> T:
         pass
 
     @abstractmethod
-    def visit_grouping_expr(self, expr: GroupingExpr) -> T:
+    def visit_grouping_expr(self, expr: "GroupingExpr") -> T:
         pass
 
     @abstractmethod
-    def visit_unary_expr(self, expr: UnaryExpr) -> T:
+    def visit_unary_expr(self, expr: "UnaryExpr") -> T:
         pass
 
     @abstractmethod
-    def visit_literal_expr(self, expr: LiteralExpr) -> T:
+    def visit_literal_expr(self, expr: "LiteralExpr") -> T:
         pass
