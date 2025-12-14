@@ -25,6 +25,9 @@ class Expr(ABC):
         @abstractmethod
         def visit_literal_expr(self, expr: LiteralExpr) -> T: ...
 
+        @abstractmethod
+        def visit_variable_expr(self, expr: VariableExpr) -> T: ...
+
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
 
@@ -62,3 +65,11 @@ class LiteralExpr(Expr):
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_literal_expr(self)
+
+
+class VariableExpr(Expr):
+    def __init__(self, name: Token) -> None:
+        self._name = name
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_variable_expr(self)

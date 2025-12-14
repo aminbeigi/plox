@@ -1,4 +1,5 @@
 from src.expr import Expr
+from src.token import Token
 
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
@@ -17,6 +18,8 @@ class Stmt(ABC):
         def visit_expression_stmt(self, stmt: Expression) -> R: ...
         @abstractmethod
         def visit_print_stmt(self, stmt: Print) -> R: ...
+        @abstractmethod
+        def visit_var_stmt(self, stmt: Var) -> R: ...
 
     @abstractmethod
     def accept(self, visitor: Stmt.Visitor[R]) -> R: ...
@@ -32,7 +35,16 @@ class Expression(Stmt):
 
 class Print(Stmt):
     def __init__(self, expression: Expr) -> None:
-        self.expression = expression
+        self._expression = expression
 
     def accept(self, visitor: Stmt.Visitor[R]) -> R:
         return visitor.visit_print_stmt(self)
+
+
+class Var(Stmt):
+    def __init__(self, name: Token, initializer: Expr) -> None:
+        self._name = name
+        self._initializer = initializer
+
+    def accept(self, visitor: Stmt.Visitor[R]) -> R:
+        return visitor.visit_var_stmt(self)
