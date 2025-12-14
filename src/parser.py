@@ -6,8 +6,9 @@ from src.expr import BinaryExpr
 from src.expr import UnaryExpr
 from src.expr import LiteralExpr
 from src.expr import GroupingExpr
+from src.expr import VariableExpr
 from src.exceptions import ParseError
-from src.stmt import Stmt, Print, Expression
+from src.stmt import Stmt, Print, Expression, Var
 
 
 class Parser:
@@ -24,8 +25,27 @@ class Parser:
     def parse(self) -> list[Stmt]:
         statements: list[Stmt] = []
         while not self._is_at_end():
-            statements.append(self._statement())
+            statements.append(self._declaration())
         return statements
+
+    def _declaration(self) -> Stmt:
+        try:
+            if self._match(TokenType.VAR):
+                return self._var_declaration()
+            return self._statement()
+        except ParseError:
+            self._synchronize()
+            assert False
+
+    def _var_declaration(self) -> Stmt:
+        name = self._consume(TokenType.IDENTIFIER, "Expect variable name.")
+        initalizer: Expr | None = None
+
+        if self._match(TokenType.EQUAL):
+            initalizer = self._expression()
+
+        self._consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Var(name, initalizer)
 
     def _statement(self) -> Stmt:
         if self._match(TokenType.PRINT):
@@ -110,6 +130,9 @@ class Parser:
 
         if self._match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self._previous().literal)
+
+        if self._match(TokenType.IDENTIFIER):
+            return VariableExpr(self._previous())
 
         if self._match(TokenType.LEFT_PAREN):
             expr = self._expression()

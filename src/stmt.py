@@ -42,7 +42,7 @@ class Print(Stmt):
 
 
 class Var(Stmt):
-    def __init__(self, name: Token, initializer: Expr) -> None:
+    def __init__(self, name: Token, initializer: Expr | None) -> None:
         self._name = name
         self._initializer = initializer
 
