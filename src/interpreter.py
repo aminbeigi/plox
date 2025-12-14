@@ -1,34 +1,27 @@
 from src.expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, Expr
-from src.visitor import Visitor
 from src.token_type import TokenType
 from src.token import Token
 from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
+from src.stmt import Stmt, Expression, Print
 
 
-class Interpreter(Visitor[object]):
+class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def interpret(
-        self, expression: Expr, error_reporter: Callable[[PloxRuntimeError], None]
+        self, statements: list[Stmt], error_reporter: Callable[[PloxRuntimeError], None]
     ) -> None:
-        """Interpret an expression and print the result."""
         try:
-            value = self._evaluate(expression)
-            print(self._stringify(value))
+            for statement in statements:
+                self._execute(statement)
         except PloxRuntimeError as error:
             error_reporter(error)
 
-    def _stringify(self, obj: object) -> str:
-        """Convert a Lox value to its string representation."""
-        if obj is None:
-            return "nil"
+    def visit_expression_stmt(self, stmt: Expression) -> None:
+        self._evaluate(stmt.expression)
 
-        if isinstance(obj, float):
-            text = str(obj)
-            if text.endswith(".0"):
-                text = text[0 : len(text) - 2]
-            return text
-
-        return str(obj)
+    def visit_print_stmt(self, stmt: Print) -> None:
+        value = self._evaluate(stmt.expression)
+        print(self._stringify(value))
 
     def visit_binary_expr(self, expr: BinaryExpr) -> object:
         """Evaluate a binary expression."""
@@ -108,6 +101,22 @@ class Interpreter(Visitor[object]):
     def visit_literal_expr(self, expr: LiteralExpr) -> object:
         """Evaluate a literal expression."""
         return expr.value
+
+    def _stringify(self, obj: object) -> str:
+        """Convert a Lox value to its string representation."""
+        if obj is None:
+            return "nil"
+
+        if isinstance(obj, float):
+            text = str(obj)
+            if text.endswith(".0"):
+                text = text[0 : len(text) - 2]
+            return text
+
+        return str(obj)
+
+    def _execute(self, statement: Stmt) -> None:
+        statement.accept(self)
 
     def _evaluate(self, expr: Expr) -> object:
         """Evaluate an expression using the visitor pattern."""

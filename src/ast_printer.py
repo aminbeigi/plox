@@ -1,8 +1,7 @@
 from src.expr import Expr, BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr
-from src.visitor import Visitor
 
 
-class AstPrinter(Visitor[str]):
+class AstPrinter(Expr.Visitor[str]):
     """Prints the AST in a parenthesized format."""
 
     def print(self, expr: Expr) -> str:

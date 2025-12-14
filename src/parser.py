@@ -7,6 +7,7 @@ from src.expr import UnaryExpr
 from src.expr import LiteralExpr
 from src.expr import GroupingExpr
 from src.exceptions import ParseError
+from src.stmt import Stmt, Print, Expression
 
 
 class Parser:
@@ -20,12 +21,26 @@ class Parser:
         self._current = 0
         self._error_reporter = error_reporter
 
-    def parse(self) -> Expr | None:
-        """Parse the tokens into an expression AST."""
-        try:
-            return self._expression()
-        except ParseError:
-            return None
+    def parse(self) -> list[Stmt]:
+        statements: list[Stmt] = []
+        while not self._is_at_end():
+            statements.append(self._statement())
+        return statements
+
+    def _statement(self) -> Stmt:
+        if self._match(TokenType.PRINT):
+            return self._print_statement()
+        return self._expression_statement()
+
+    def _print_statement(self) -> Stmt:
+        value = self._expression()
+        self._consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Print(value)
+
+    def _expression_statement(self) -> Stmt:
+        expr = self._expression()
+        self._consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Expression(expr)
 
     def _expression(self) -> Expr:
         """Parse an expression (top-level rule)."""

@@ -13,7 +13,9 @@ class Stmt(ABC):
     """
 
     class Visitor(ABC, Generic[R]):
+        @abstractmethod
         def visit_expression_stmt(self, stmt: Expression) -> R: ...
+        @abstractmethod
         def visit_print_stmt(self, stmt: Print) -> R: ...
 
     @abstractmethod

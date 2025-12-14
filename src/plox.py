@@ -52,11 +52,11 @@ class Plox:
         scanner = Scanner(source, self._error_line)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self._error)
-        expression = parser.parse()
+        statements = parser.parse()
         if self._had_error:
             return
-        assert expression is not None
-        self._interpreter.interpret(expression, self._runtime_error)
+
+        self._interpreter.interpret(statements, self._runtime_error)
 
     def _error(self, token: Token, message: str) -> None:
         """Reports an error at a specific token."""
