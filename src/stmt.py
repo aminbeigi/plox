@@ -15,17 +15,17 @@ class Stmt(ABC):
 
     class Visitor(ABC, Generic[R]):
         @abstractmethod
-        def visit_expression_stmt(self, stmt: Expression) -> R: ...
+        def visit_expression_stmt(self, stmt: ExpressionStmt) -> R: ...
         @abstractmethod
-        def visit_print_stmt(self, stmt: Print) -> R: ...
+        def visit_print_stmt(self, stmt: PrintStmt) -> R: ...
         @abstractmethod
-        def visit_var_stmt(self, stmt: Var) -> R: ...
+        def visit_var_stmt(self, stmt: VarStmt) -> R: ...
 
     @abstractmethod
     def accept(self, visitor: Stmt.Visitor[R]) -> R: ...
 
 
-class Expression(Stmt):
+class ExpressionStmt(Stmt):
     def __init__(self, expression: Expr) -> None:
         self.expression = expression
 
@@ -33,15 +33,15 @@ class Expression(Stmt):
         return visitor.visit_expression_stmt(self)
 
 
-class Print(Stmt):
+class PrintStmt(Stmt):
     def __init__(self, expression: Expr) -> None:
-        self._expression = expression
+        self.expression = expression
 
     def accept(self, visitor: Stmt.Visitor[R]) -> R:
         return visitor.visit_print_stmt(self)
 
 
-class Var(Stmt):
+class VarStmt(Stmt):
     def __init__(self, name: Token, initializer: Expr | None) -> None:
         self._name = name
         self._initializer = initializer

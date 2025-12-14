@@ -8,7 +8,7 @@ from src.expr import LiteralExpr
 from src.expr import GroupingExpr
 from src.expr import VariableExpr
 from src.exceptions import ParseError
-from src.stmt import Stmt, Print, Expression, Var
+from src.stmt import Stmt, PrintStmt, ExpressionStmt, VarStmt
 
 
 class Parser:
@@ -45,7 +45,7 @@ class Parser:
             initalizer = self._expression()
 
         self._consume(TokenType.SEMICOLON, "Expect ';' after value.")
-        return Var(name, initalizer)
+        return VarStmt(name, initalizer)
 
     def _statement(self) -> Stmt:
         if self._match(TokenType.PRINT):
@@ -55,12 +55,12 @@ class Parser:
     def _print_statement(self) -> Stmt:
         value = self._expression()
         self._consume(TokenType.SEMICOLON, "Expect ';' after value.")
-        return Print(value)
+        return PrintStmt(value)
 
     def _expression_statement(self) -> Stmt:
         expr = self._expression()
         self._consume(TokenType.SEMICOLON, "Expect ';' after expression.")
-        return Expression(expr)
+        return ExpressionStmt(expr)
 
     def _expression(self) -> Expr:
         """Parse an expression (top-level rule)."""

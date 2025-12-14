@@ -3,7 +3,7 @@ from src.token_type import TokenType
 from src.token import Token
 from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
-from src.stmt import Stmt, Expression, Print
+from src.stmt import Stmt, ExpressionStmt, PrintStmt
 
 
 class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
@@ -16,10 +16,10 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         except PloxRuntimeError as error:
             error_reporter(error)
 
-    def visit_expression_stmt(self, stmt: Expression) -> None:
+    def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self._evaluate(stmt.expression)
 
-    def visit_print_stmt(self, stmt: Print) -> None:
+    def visit_print_stmt(self, stmt: PrintStmt) -> None:
         value = self._evaluate(stmt.expression)
         print(self._stringify(value))
 
