@@ -11,7 +11,7 @@ from src.token_type import TokenType
 from src.token import Token
 from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
-from src.stmt import BlockStmt, Stmt, ExpressionStmt, PrintStmt, VarStmt
+from src.stmt import BlockStmt, Stmt, ExpressionStmt, PrintStmt, VarStmt, IfStmt
 from src.environment import Environment
 
 
@@ -44,6 +44,12 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def visit_print_stmt(self, stmt: PrintStmt) -> None:
         value = self._evaluate(stmt.expression)
         print(self._stringify(value))
+
+    def visit_if_stmt(self, stmt: IfStmt) -> None:
+        if self._is_truthy(self._evaluate(stmt.condition)):
+            self._execute(stmt.then_branch)
+        elif stmt.else_branch is not None:
+            self._execute(stmt.else_branch)
 
     def visit_assign_expr(self, expr: AssignExpr) -> object:
         value = self._evaluate(expr.value)

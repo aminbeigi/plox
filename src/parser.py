@@ -9,7 +9,7 @@ from src.expr import GroupingExpr
 from src.expr import VariableExpr
 from src.expr import AssignExpr
 from src.exceptions import ParseError
-from src.stmt import Stmt, PrintStmt, ExpressionStmt, VarStmt, BlockStmt
+from src.stmt import Stmt, PrintStmt, ExpressionStmt, VarStmt, BlockStmt, IfStmt
 
 
 class Parser:
@@ -50,7 +50,21 @@ class Parser:
         self._consume(TokenType.SEMICOLON, "Expect ';' after value.")
         return VarStmt(name, initalizer)
 
+    def _if_statement(self) -> Stmt:
+        self._consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")
+        condition = self._expression()
+        self._consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+
+        then_branch = self._statement()
+        else_branch: Stmt | None = None
+        if self._match(TokenType.ELSE):
+            else_branch = self._statement()
+
+        return IfStmt(condition, then_branch, else_branch)
+
     def _statement(self) -> Stmt:
+        if self._match(TokenType.IF):
+            return self._if_statement()
         if self._match(TokenType.PRINT):
             return self._print_statement()
         if self._match(TokenType.LEFT_BRACE):
@@ -60,7 +74,8 @@ class Parser:
     def _block(self) -> list[Stmt]:
         statements: list[Stmt] = []
         while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
-            statements.append(self._declaration())
+            # TODO
+            statements.append(self._declaration())  # type: ignore
 
         self._consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
