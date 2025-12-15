@@ -3,6 +3,7 @@ from src.expr import (
     BinaryExpr,
     GroupingExpr,
     LiteralExpr,
+    LogicalExpr,
     UnaryExpr,
     Expr,
     VariableExpr,
@@ -134,6 +135,19 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
     def visit_literal_expr(self, expr: LiteralExpr) -> object:
         """Evaluate a literal expression."""
         return expr.value
+
+    def visit_logical_expr(self, expr: LogicalExpr) -> object:
+        """Evaluate a logical expression with short-circuiting."""
+        left = self._evaluate(expr.left)
+
+        if expr.operator.type == TokenType.OR:
+            if self._is_truthy(left):
+                return left
+        else:  # AND
+            if not self._is_truthy(left):
+                return left
+
+        return self._evaluate(expr.right)
 
     def _stringify(self, obj: object) -> str:
         """Convert a Lox value to its string representation."""

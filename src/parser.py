@@ -8,6 +8,7 @@ from src.expr import LiteralExpr
 from src.expr import GroupingExpr
 from src.expr import VariableExpr
 from src.expr import AssignExpr
+from src.expr import LogicalExpr
 from src.exceptions import ParseError
 from src.stmt import Stmt, PrintStmt, ExpressionStmt, VarStmt, BlockStmt, IfStmt
 
@@ -95,7 +96,7 @@ class Parser:
         return self._assignment()
 
     def _assignment(self) -> Expr:
-        expr = self._equality()
+        expr = self._or()
 
         if self._match(TokenType.EQUAL):
             # equals = self._previous()
@@ -107,6 +108,24 @@ class Parser:
 
             # error(equals, "Invalid assignment target.");  # TODO
 
+        return expr
+
+    def _or(self) -> Expr:
+        expr = self._and()
+
+        while self._match(TokenType.OR):
+            operator = self._previous()
+            right = self._and()
+            expr = LogicalExpr(expr, operator, right)
+        return expr
+
+    def _and(self) -> Expr:
+        expr = self._equality()
+
+        while self._match(TokenType.AND):
+            operator = self._previous()
+            right = self._equality()
+            expr = LogicalExpr(expr, operator, right)
         return expr
 
     def _equality(self) -> Expr:
