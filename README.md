@@ -1,6 +1,6 @@
 # plox
 
-A Python implementation of the Lox programming language interpreter, following the book "Crafting Interpreters" by Robert Nystrom.
+A Python implementation of the Lox programming language interpreter using the tree-walking interpretation method, following the book "Crafting Interpreters" by Robert Nystrom.
 
 ## Getting Started
 
@@ -9,7 +9,7 @@ These instructions will help you set up and run the Plox interpreter on your loc
 ### Prerequisites
 
 - Python 3.14 or higher
-- [uv](https://github.com/astral-sh/uv) package manager
+- [uv](https://github.com/astral-sh/uv) package manager version 0.9.4 or higher
 
 ### Installing
 
@@ -51,33 +51,35 @@ Run specific tests:
 uv run pytest tests/test_scanner.py
 ```
 
-### Test Coverage
+## Implementation Notes
 
-The test suite currently includes:
-- Scanner/lexer tests for tokenizing source code
-- Token equality and representation tests
+This interpreter follows the tree-walking approach:
 
-## Project Structure
+1. **Scanning**: Source code is tokenized into a stream of tokens
+2. **Parsing**: Tokens are parsed into an Abstract Syntax Tree (AST) using recursive descent
+3. **Interpretation**: The AST is evaluated directly using the visitor pattern
 
-```
-plox/
-├── src/
-│   ├── main.py         # Entry point
-│   ├── plox.py         # Main interpreter class
-│   ├── scanner.py      # Lexical scanner/tokenizer
-│   ├── token.py        # Token class
-│   └── token_type.py   # Token type enumeration
-├── tests/
-│   ├── test_scanner.py # Scanner tests
-│   └── test_token.py   # Token tests
-└── pyproject.toml      # Project configuration
-```
+### Current Progress
+
+**A Tree-Walk Interpreter**
+- ✅ Chapter 4: Scanning
+- ✅ Chapter 5: Representing Code  
+- ✅ Chapter 6: Parsing Expressions
+- ✅ Chapter 7: Evaluating Expressions
+- ✅ Chapter 8: Statements and State
+- ✅ Chapter 9: Control Flow
+- 🚧 Chapter 10: Functions (function calls implemented, declarations in progress)
+- ⏳ Chapter 11: Resolving and Binding
+- ⏳ Chapter 12: Classes  
+- ⏳ Chapter 13: Inheritance
+
 
 ## Built With
 
 * [Python](https://www.python.org/) - Programming language
 * [pytest](https://pytest.org/) - Testing framework
 * [uv](https://github.com/astral-sh/uv) - Package manager
+* [ruff](https://github.com/astral-sh/ruff) - Python linter and formatter
 
 ## Authors
 
@@ -86,4 +88,4 @@ plox/
 ## Acknowledgments
 
 * Based on "Crafting Interpreters" by Robert Nystrom
-* [craftinginterpreters.com](https://craftinginterpreters.com/)
+* https://craftinginterpreters.com/
