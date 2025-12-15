@@ -11,7 +11,7 @@ from src.token_type import TokenType
 from src.token import Token
 from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
-from src.stmt import Stmt, ExpressionStmt, PrintStmt, VarStmt
+from src.stmt import BlockStmt, Stmt, ExpressionStmt, PrintStmt, VarStmt
 from src.environment import Environment
 
 
@@ -36,7 +36,7 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         self._environment.define(stmt.name.lexeme, value)
 
     def visit_variable_expr(self, expr: VariableExpr) -> object:
-        self._environment.get(expr.name)
+        return self._environment.get(expr.name)
 
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self._evaluate(stmt.expression)
@@ -144,6 +144,19 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
 
     def _execute(self, statement: Stmt) -> None:
         statement.accept(self)
+
+    def visit_block_stmt(self, stmt: BlockStmt) -> None:
+        self._execute_block(stmt.statements, Environment(self._environment))
+
+    def _execute_block(self, statements: list[Stmt], environment: Environment) -> None:
+        previous = self._environment
+        try:
+            self._environment = environment
+            for statement in statements:
+                self._execute(statement)
+
+        finally:
+            self._environment = previous
 
     def _evaluate(self, expr: Expr) -> object:
         """Evaluate an expression using the visitor pattern."""

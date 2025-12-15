@@ -20,6 +20,8 @@ class Stmt(ABC):
         def visit_print_stmt(self, stmt: PrintStmt) -> R: ...
         @abstractmethod
         def visit_var_stmt(self, stmt: VarStmt) -> R: ...
+        @abstractmethod
+        def visit_block_stmt(self, stmt: BlockStmt) -> R: ...
 
     @abstractmethod
     def accept(self, visitor: Stmt.Visitor[R]) -> R: ...
@@ -48,3 +50,11 @@ class VarStmt(Stmt):
 
     def accept(self, visitor: Stmt.Visitor[R]) -> R:
         return visitor.visit_var_stmt(self)
+
+
+class BlockStmt(Stmt):
+    def __init__(self, statements: list[Stmt]) -> None:
+        self.statements = statements
+
+    def accept(self, visitor: Stmt.Visitor[R]) -> R:
+        return visitor.visit_block_stmt(self)
