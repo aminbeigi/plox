@@ -7,6 +7,7 @@ from src.expr import UnaryExpr
 from src.expr import LiteralExpr
 from src.expr import GroupingExpr
 from src.expr import VariableExpr
+from src.expr import AssignExpr
 from src.exceptions import ParseError
 from src.stmt import Stmt, PrintStmt, ExpressionStmt, VarStmt
 
@@ -64,7 +65,22 @@ class Parser:
 
     def _expression(self) -> Expr:
         """Parse an expression (top-level rule)."""
-        return self._equality()
+        return self._assignment()
+
+    def _assignment(self) -> Expr:
+        expr = self._equality()
+
+        if self._match(TokenType.EQUAL):
+            # equals = self._previous()
+            value = self._assignment()
+
+            if isinstance(expr, VariableExpr):
+                name = expr.name
+                return AssignExpr(name, value)
+
+            # error(equals, "Invalid assignment target.");  # TODO
+
+        return expr
 
     def _equality(self) -> Expr:
         """Parse equality expressions (== !=)."""

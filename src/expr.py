@@ -14,6 +14,9 @@ class Expr(ABC):
         """Visitor interface for expression nodes."""
 
         @abstractmethod
+        def visit_assign_expr(self, expr: AssignExpr) -> T: ...
+
+        @abstractmethod
         def visit_binary_expr(self, expr: BinaryExpr) -> T: ...
 
         @abstractmethod
@@ -30,6 +33,15 @@ class Expr(ABC):
 
     @abstractmethod
     def accept(self, visitor: Visitor[T]) -> T: ...
+
+
+class AssignExpr(Expr):
+    def __init__(self, name: Token, value: Expr) -> None:
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor: Expr.Visitor[T]) -> T:
+        return visitor.visit_assign_expr(self)
 
 
 class BinaryExpr(Expr):
@@ -69,7 +81,7 @@ class LiteralExpr(Expr):
 
 class VariableExpr(Expr):
     def __init__(self, name: Token) -> None:
-        self._name = name
+        self.name = name
 
     def accept(self, visitor: Expr.Visitor[T]) -> T:
         return visitor.visit_variable_expr(self)

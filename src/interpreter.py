@@ -1,12 +1,24 @@
-from src.expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr, Expr
+from src.expr import (
+    AssignExpr,
+    BinaryExpr,
+    GroupingExpr,
+    LiteralExpr,
+    UnaryExpr,
+    Expr,
+    VariableExpr,
+)
 from src.token_type import TokenType
 from src.token import Token
 from src.exceptions import PloxRuntimeError
 from collections.abc import Callable
-from src.stmt import Stmt, ExpressionStmt, PrintStmt
+from src.stmt import Stmt, ExpressionStmt, PrintStmt, VarStmt
+from src.environment import Environment
 
 
 class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
+    def __init__(self) -> None:
+        self._environment = Environment()
+
     def interpret(
         self, statements: list[Stmt], error_reporter: Callable[[PloxRuntimeError], None]
     ) -> None:
@@ -16,12 +28,27 @@ class Interpreter(Expr.Visitor[object], Stmt.Visitor[None]):
         except PloxRuntimeError as error:
             error_reporter(error)
 
+    def visit_var_stmt(self, stmt: VarStmt) -> None:
+        value: object | None = None
+        if stmt.initializer is not None:
+            value = self._evaluate(stmt.initializer)
+
+        self._environment.define(stmt.name.lexeme, value)
+
+    def visit_variable_expr(self, expr: VariableExpr) -> object:
+        self._environment.get(expr.name)
+
     def visit_expression_stmt(self, stmt: ExpressionStmt) -> None:
         self._evaluate(stmt.expression)
 
     def visit_print_stmt(self, stmt: PrintStmt) -> None:
         value = self._evaluate(stmt.expression)
         print(self._stringify(value))
+
+    def visit_assign_expr(self, expr: AssignExpr) -> object:
+        value = self._evaluate(expr.value)
+        self._environment.assign(expr.name, value)
+        return value
 
     def visit_binary_expr(self, expr: BinaryExpr) -> object:
         """Evaluate a binary expression."""

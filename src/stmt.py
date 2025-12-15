@@ -43,8 +43,8 @@ class PrintStmt(Stmt):
 
 class VarStmt(Stmt):
     def __init__(self, name: Token, initializer: Expr | None) -> None:
-        self._name = name
-        self._initializer = initializer
+        self.name = name
+        self.initializer = initializer
 
     def accept(self, visitor: Stmt.Visitor[R]) -> R:
         return visitor.visit_var_stmt(self)
